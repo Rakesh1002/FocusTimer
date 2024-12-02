@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Circle with Gradient -->
+    <defs>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#1976D2;stop-opacity:1" />
+        </linearGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="15"/>
+            <feOffset dx="0" dy="10" result="offsetblur"/>
+            <feComponentTransfer>
+                <feFuncA type="linear" slope="0.3"/>
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <!-- Main Circle -->
+    <circle cx="512" cy="512" r="460" 
+            fill="url(#grad1)" 
+            stroke="#FFFFFF" 
+            stroke-width="30"
+            filter="url(#shadow)"/>
+
+    <!-- Clock Hands -->
+    <g transform="translate(512,512)">
+        <!-- Hour Marks -->
+        <g id="marks">
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(0)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(30)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(60)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(90)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(120)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(150)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(180)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(210)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(240)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(270)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(300)"/>
+            <line x1="0" y1="-400" x2="0" y2="-360" 
+                  stroke="#FFFFFF" stroke-width="30" stroke-linecap="round"
+                  transform="rotate(330)"/>
+        </g>
+
+        <!-- Clock Hands -->
+        <line x1="0" y1="0" x2="0" y2="-280" 
+              stroke="#FFFFFF" stroke-width="40" stroke-linecap="round"
+              transform="rotate(45)"/>
+        <line x1="0" y1="0" x2="0" y2="-180" 
+              stroke="#FFFFFF" stroke-width="40" stroke-linecap="round"
+              transform="rotate(180)"/>
+              
+        <!-- Center Dot -->
+        <circle cx="0" cy="0" r="30" fill="#FFFFFF"/>
+    </g>
+</svg>
