@@ -4,14 +4,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "FocusTimer",
+    name: "Focusly",
     platforms: [
         .macOS(.v13)
     ],
     products: [
         .executable(
-            name: "FocusTimer",
-            targets: ["FocusTimer"]),
+            name: "Focusly",
+            targets: ["Focusly"]),
     ],
     dependencies: [
     ],
@@ -19,10 +19,10 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .executableTarget(
-            name: "FocusTimer",
+            name: "Focusly",
             dependencies: []),
         .testTarget(
-            name: "FocusTimerTests",
-            dependencies: ["FocusTimer"]),
+            name: "FocuslyTests",
+            dependencies: ["Focusly"]),
     ]
 )

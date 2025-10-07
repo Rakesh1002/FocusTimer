@@ -2,9 +2,17 @@ import SwiftUI
 import AppKit
 
 class TimeOverlayWindow: NSWindow {
-    init() {
+    init(screen: NSScreen = NSScreen.main ?? NSScreen.screens[0]) {
+        // Calculate position on the specified screen
+        let screenFrame = screen.visibleFrame
+        let windowWidth: CGFloat = 120
+        let windowHeight: CGFloat = 40
+        let windowX = screenFrame.maxX - windowWidth - 20
+        let windowY = screenFrame.maxY - windowHeight - 20
+        
+        // Initialize with position on the specified screen
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 120, height: 40),
+            contentRect: NSRect(x: windowX, y: windowY, width: windowWidth, height: windowHeight),
             styleMask: [.borderless],
             backing: .buffered,
             defer: false
@@ -18,16 +26,6 @@ class TimeOverlayWindow: NSWindow {
         self.titleVisibility = .hidden
         self.isMovableByWindowBackground = true
         self.ignoresMouseEvents = false
-        
-        // Position window in top-right corner
-        if let screen = NSScreen.main {
-            let screenFrame = screen.visibleFrame
-            let windowFrame = self.frame
-            self.setFrameOrigin(NSPoint(
-                x: screenFrame.maxX - windowFrame.width - 20,
-                y: screenFrame.maxY - windowFrame.height - 20
-            ))
-        }
     }
 }
 
@@ -47,6 +45,7 @@ class TimeDisplayWindowController: NSWindowController {
 struct TimeDisplayWindow: View {
     @EnvironmentObject var timerManager: TimerManager
     @State private var currentTime = Date()
+    @State private var previousRunningState = false
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
@@ -67,14 +66,25 @@ struct TimeDisplayWindow: View {
         .frame(width: 120)
         .background(Color.black.opacity(0.75))
         .cornerRadius(8)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            // Open the main app popover when clicked
+            NotificationCenter.default.post(name: NSNotification.Name("OpenMainPopover"), object: nil)
+        }
         .onReceive(timer) { time in
             currentTime = time
-            if let window = NSApp.windows.first(where: { $0 is TimeOverlayWindow }) {
-                let newHeight: CGFloat = timerManager.isRunning ? 70 : 40
-                var frame = window.frame
-                frame.origin.y += frame.height - newHeight
-                frame.size.height = newHeight
-                window.setFrame(frame, display: true, animate: true)
+        }
+        .onChange(of: timerManager.isRunning) { isRunning in
+            // Only resize window when running state changes, not every second
+            if previousRunningState != isRunning {
+                if let window = NSApp.windows.first(where: { $0 is TimeOverlayWindow }) {
+                    let newHeight: CGFloat = isRunning ? 70 : 40
+                    var frame = window.frame
+                    frame.origin.y += frame.height - newHeight
+                    frame.size.height = newHeight
+                    window.setFrame(frame, display: true, animate: false)
+                }
+                previousRunningState = isRunning
             }
         }
     }

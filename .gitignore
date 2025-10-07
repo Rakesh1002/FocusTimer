@@ -74,3 +74,19 @@ build/
 *.log
 *.sqlite
 *.sqlite3
+
+# Project-specific
+#
+# External canvas editor projects
+canvas_editor/
+
+# Build and distribution artifacts
+Distribution/
+Focusly.app/
+Focusly.zip
+embedded.provisionprofile
+focusly.provisionprofile
+Docs/
+Marketing_Assets/
+Scripts/
+

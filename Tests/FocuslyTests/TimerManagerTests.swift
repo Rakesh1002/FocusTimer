@@ -1,5 +1,5 @@
 import XCTest
-@testable import FocusTimer
+@testable import Focusly
 
 final class TimerManagerTests: XCTestCase {
     var timerManager: TimerManager!
