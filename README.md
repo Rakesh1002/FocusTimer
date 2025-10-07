@@ -9,11 +9,10 @@
 </p>
 
 <p align="center">
-  <a href="#-documentation">Documentation</a> •
   <a href="#-features">Features</a> •
   <a href="#-installation">Installation</a> •
   <a href="#-usage">Usage</a> •
-  <a href="#-building-from-source">Building</a> •
+  <a href="#️-building-from-source">Building</a>
 </p>
 
 ---
@@ -98,6 +97,41 @@
 - 💾 **Local Storage** - No cloud, no accounts required
 - 🔐 **Calendar Privacy** - Calendar data never leaves your device
 - ⚡ **Offline First** - Works completely offline
+
+---
+
+## 💻 Installation
+
+### Mac App Store (Coming Soon)
+
+1. Open the Mac App Store
+2. Search for "Focusly"
+3. Click "Get" or purchase ($7.99)
+4. Launch from menu bar icon
+
+### Direct Download
+
+1. Download the latest `.dmg` from [Releases](https://github.com/rakesh1002/Focusly/releases/latest)
+2. Open the `.dmg` file
+3. Drag Focusly to Applications folder
+4. Launch from Applications or menu bar
+
+### System Requirements
+
+- **macOS**: 13.0 (Ventura) or later
+- **Processor**: Apple Silicon (M1/M2/M3/M4) or Intel
+- **Memory**: 100 MB RAM
+- **Storage**: 50 MB free disk space
+- **Optional**: Calendar access for meeting integration features
+
+### First Launch
+
+1. Look for the timer icon in your menu bar (top-right)
+2. Click the icon to open Focusly
+3. Grant calendar access when prompted (optional but recommended)
+4. Start your first focus session!
+
+> **For Developers**: See [Building from Source](#️-building-from-source) below to compile and run from code.
 
 ---
 
