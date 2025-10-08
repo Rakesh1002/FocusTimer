@@ -105,17 +105,19 @@ class Settings: ObservableObject {
         self.workDuration = defaults.double(forKey: "workDuration").nonZero ?? 50 * 60
         self.breakDuration = defaults.double(forKey: "breakDuration").nonZero ?? 10 * 60
         self.maxCycles = defaults.integer(forKey: "maxCycles").nonZero ?? 4
+        
+        // All display and notification features enabled by default
         self.showTimeDisplay = defaults.object(forKey: "showTimeDisplay") as? Bool ?? true
-        self.showBreakOverlay = defaults.bool(forKey: "showBreakOverlay")
-        self.breakNotifications = defaults.bool(forKey: "breakNotifications")
-        self.sessionCompleteNotifications = defaults.bool(forKey: "sessionCompleteNotifications")
+        self.showBreakOverlay = defaults.object(forKey: "showBreakOverlay") as? Bool ?? true
+        self.breakNotifications = defaults.object(forKey: "breakNotifications") as? Bool ?? true
+        self.sessionCompleteNotifications = defaults.object(forKey: "sessionCompleteNotifications") as? Bool ?? true
         self.showBreakActivities = defaults.object(forKey: "showBreakActivities") as? Bool ?? true
         
         // Launch at login - default to true
         self.launchAtLogin = defaults.object(forKey: "launchAtLogin") as? Bool ?? true
         
-        // Show floating timer on all screens - default to false (primary screen only)
-        self.showFloatingTimerOnAllScreens = defaults.bool(forKey: "showFloatingTimerOnAllScreens")
+        // Show floating timer on all screens - default to true for better visibility
+        self.showFloatingTimerOnAllScreens = defaults.object(forKey: "showFloatingTimerOnAllScreens") as? Bool ?? true
         
         // Notification settings - default to enabled for better user experience
         self.taskDueNotifications = defaults.object(forKey: "taskDueNotifications") as? Bool ?? true

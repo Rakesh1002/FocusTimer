@@ -36,12 +36,13 @@ class PermissionManager: ObservableObject {
             // Show instructions if needed
             let alert = NSAlert()
             alert.messageText = "Screen Recording Permission Required"
-            alert.informativeText = "Please grant screen recording permission in System Preferences > Security & Privacy > Privacy > Screen Recording"
+            alert.informativeText = "Please grant screen recording permission in System Settings > Privacy & Security > Screen Recording"
             alert.alertStyle = .warning
-            alert.addButton(withTitle: "Open System Preferences")
+            alert.addButton(withTitle: "Open System Settings")
             alert.addButton(withTitle: "Later")
             
             if alert.runModal() == .alertFirstButtonReturn {
+                // Use the x-apple.systempreferences URL scheme (allowed in sandboxed apps)
                 if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
                     NSWorkspace.shared.open(url)
                 }
@@ -53,12 +54,13 @@ class PermissionManager: ObservableObject {
         if !hasAccessibilityPermission {
             let alert = NSAlert()
             alert.messageText = "Accessibility Permission Required"
-            alert.informativeText = "Please grant accessibility permission in System Preferences > Security & Privacy > Privacy > Accessibility"
+            alert.informativeText = "Please grant accessibility permission in System Settings > Privacy & Security > Accessibility"
             alert.alertStyle = .warning
-            alert.addButton(withTitle: "Open System Preferences")
+            alert.addButton(withTitle: "Open System Settings")
             alert.addButton(withTitle: "Later")
             
             if alert.runModal() == .alertFirstButtonReturn {
+                // Use the x-apple.systempreferences URL scheme (allowed in sandboxed apps)
                 if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
                     NSWorkspace.shared.open(url)
                 }

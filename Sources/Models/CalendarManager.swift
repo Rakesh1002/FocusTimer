@@ -176,23 +176,12 @@ class CalendarManager: ObservableObject {
     }
     
     func openSystemPreferences() {
-        // For macOS 13+ (Ventura and later), use the new System Settings URL scheme
-        // For older versions, fall back to System Preferences
-        let urlString: String
-        
-        if #available(macOS 13.0, *) {
-            // Modern macOS - System Settings
-            urlString = "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars"
-        } else {
-            // Legacy macOS - System Preferences
-            urlString = "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars"
-        }
+        // Use the x-apple.systempreferences URL scheme (allowed in sandboxed apps)
+        // This works for both macOS 13+ (System Settings) and earlier versions (System Preferences)
+        let urlString = "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars"
         
         if let url = URL(string: urlString) {
             NSWorkspace.shared.open(url)
-        } else {
-            // Fallback: Open Security & Privacy directly
-            NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Library/PreferencePanes/Security.prefPane"))
         }
     }
     
@@ -306,8 +295,10 @@ class CalendarManager: ObservableObject {
             return true
         }
         
-        // Check if we're currently in a meeting
-        return upcomingEvents.contains { $0.isInProgress }
+        // Check if we're currently in a meeting (excluding all-day events)
+        return upcomingEvents.contains { event in
+            !event.isAllDay && event.isInProgress
+        }
     }
     
     func getNextAvailableTime() -> Date? {

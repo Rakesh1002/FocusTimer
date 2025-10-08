@@ -86,7 +86,19 @@ Focusly.app/
 Focusly.zip
 embedded.provisionprofile
 focusly.provisionprofile
+
+# CI/CD Sensitive Files
+Certificates/
+*.p12
+*.mobileprovision
+*.provisionprofile
+*.cer
+*.certSigningRequest
+AuthKey_*.p8
+password.txt
+
+# Keep these directories but ignore sensitive content
+Scripts/
 Docs/
 Marketing_Assets/
-Scripts/
 
