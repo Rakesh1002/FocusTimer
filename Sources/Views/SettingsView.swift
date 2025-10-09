@@ -130,6 +130,32 @@ struct SettingsView: View {
                             .foregroundStyle(.white.opacity(0.6))
                     }
                     
+                    Section("About") {
+                        Button(action: {
+                            if let url = URL(string: "https://focusly.unquest.ai/privacy") {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }) {
+                            HStack {
+                                Text("Privacy Policy")
+                                    .foregroundStyle(.white.opacity(0.9))
+                                Spacer()
+                                Image(systemName: "arrow.up.right.square")
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity)
+                        
+                        HStack {
+                            Text("Version")
+                                .foregroundStyle(.white.opacity(0.9))
+                            Spacer()
+                            Text("1.0.0 (6)")
+                                .foregroundStyle(.white.opacity(0.6))
+                        }
+                    }
+                    
                     Section("Keyboard Shortcuts") {
                         VStack(alignment: .leading, spacing: 8) {
                             ShortcutRow(key: "⌘⌥T", action: "Start/Stop Timer")
@@ -166,4 +192,5 @@ struct ShortcutRow: View {
                 .foregroundStyle(.white)
         }
     }
+
 }

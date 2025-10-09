@@ -4,8 +4,9 @@ import Foundation
 /// Ensures all models read/write from the correct domain
 extension UserDefaults {
     static let app: UserDefaults = {
-        // Try to use suite name first (for app groups), fall back to standard
-        if let suite = UserDefaults(suiteName: "com.unquest.focusly") {
+        // Use the actual bundle identifier (unquest.focusly)
+        // This ensures data persists correctly across updates
+        if let suite = UserDefaults(suiteName: "unquest.focusly") {
             return suite
         }
         return .standard

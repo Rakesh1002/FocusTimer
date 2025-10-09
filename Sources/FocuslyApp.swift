@@ -6,6 +6,8 @@ import Combine
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
     var popover: NSPopover?
+    var onboardingWindow: NSWindow?
+    var showingOnboarding = false
     let settings = Settings()
     let timerManager: TimerManager
     let statisticsManager = StatisticsManager()
@@ -32,16 +34,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Handle first launch and app updates
+        AppSetupManager.shared.performFirstLaunchSetup()
+        AppSetupManager.shared.handleAppUpdate()
+        
         setupStatusItem()
         setupKeyboardShortcuts()
         WindowManager.shared.setSettings(settings)
         WindowManager.shared.setTimerManager(timerManager)
         
-        // Show floating timer if enabled (with delay to ensure app is fully loaded)
-        if settings.showTimeDisplay {
+        // Hide the default SwiftUI window (we use menu bar + custom windows)
+        hideDefaultWindow()
+        
+        // Show onboarding for first-time users
+        if AppSetupManager.shared.shouldShowOnboarding {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                NSLog("🚀 AppDelegate: Showing floating timer on launch")
-                WindowManager.shared.showTimeDisplay()
+                self.showOnboarding()
+            }
+        } else {
+            // Show floating timer if enabled (with delay to ensure app is fully loaded)
+            if settings.showTimeDisplay {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    NSLog("🚀 AppDelegate: Showing floating timer on launch")
+                    WindowManager.shared.showTimeDisplay()
+                }
             }
         }
         setupEventMonitor()
@@ -321,11 +337,120 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Note: We no longer use local monitor as it interferes with popover interaction
     }
     
+    // MARK: - Onboarding
+    
+    func showOnboarding() {
+        showingOnboarding = true
+        
+        // Create onboarding view with proper binding
+        let onboardingView = OnboardingView(
+            isPresented: Binding(
+                get: { 
+                    print("📖 Binding GET: showingOnboarding = \(self.showingOnboarding)")
+                    return self.showingOnboarding 
+                },
+                set: { newValue in
+                    print("📝 Binding SET: newValue = \(newValue)")
+                    self.showingOnboarding = newValue
+                    if !newValue {
+                        print("📝 Binding: Calling dismissOnboarding()")
+                        self.dismissOnboarding()
+                    }
+                }
+            )
+        )
+        .environmentObject(settings)
+        .environmentObject(calendarManager)
+        
+        let hostingController = NSHostingController(rootView: onboardingView)
+        
+        // Create window for onboarding
+        onboardingWindow = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 600, height: 700),
+            styleMask: [.titled, .closable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        
+        onboardingWindow?.title = "Welcome to Focusly"
+        onboardingWindow?.contentViewController = hostingController
+        onboardingWindow?.center()
+        onboardingWindow?.isReleasedWhenClosed = false
+        onboardingWindow?.titlebarAppearsTransparent = true
+        onboardingWindow?.titleVisibility = .hidden
+        
+        // Handle window close button
+        onboardingWindow?.delegate = self
+        
+        onboardingWindow?.makeKeyAndOrderFront(nil)
+        
+        NSApp.activate(ignoringOtherApps: true)
+        
+        print("👋 Showing onboarding")
+    }
+    
+    private func hideDefaultWindow() {
+        // Hide the default SwiftUI WindowGroup window
+        DispatchQueue.main.async {
+            if let window = NSApp.windows.first(where: { $0.contentViewController is NSHostingController<MinimalView> }) {
+                window.orderOut(nil)
+                window.setIsVisible(false)
+                print("🙈 Hidden default SwiftUI window")
+            }
+        }
+    }
+    
+    private func dismissOnboarding() {
+        guard showingOnboarding else { 
+            print("⚠️ dismissOnboarding: already dismissed")
+            return
+        }
+        
+        print("👋 Dismissing onboarding")
+        
+        showingOnboarding = false
+        
+        // Close window without triggering delegate again
+        let windowToClose = onboardingWindow
+        onboardingWindow = nil
+        windowToClose?.close()
+        
+        print("✅ Onboarding window closed")
+        
+        // Show floating timer after onboarding if enabled
+        if settings.showTimeDisplay {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                print("🚀 AppDelegate: Showing floating timer after onboarding")
+                WindowManager.shared.showTimeDisplay()
+            }
+        }
+    }
+    
     // Clean up observers and monitors
     deinit {
         NotificationCenter.default.removeObserver(self)
         stopMonitoringPopover()
         cancellables.removeAll()
+    }
+}
+
+// MARK: - NSWindowDelegate
+extension AppDelegate: NSWindowDelegate {
+    func windowWillClose(_ notification: Notification) {
+        // Handle onboarding window close
+        if let window = notification.object as? NSWindow, window == onboardingWindow {
+            print("👋 Onboarding window closed via close button")
+            // Only dismiss if still showing (prevent recursion)
+            if showingOnboarding {
+                dismissOnboarding()
+            }
+        }
+    }
+    
+    func windowShouldClose(_ sender: NSWindow) -> Bool {
+        // Allow onboarding window to close
+        print("🚪 windowShouldClose called for: \(sender)")
+        return true
     }
 }
 

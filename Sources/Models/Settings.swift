@@ -113,8 +113,8 @@ class Settings: ObservableObject {
         self.sessionCompleteNotifications = defaults.object(forKey: "sessionCompleteNotifications") as? Bool ?? true
         self.showBreakActivities = defaults.object(forKey: "showBreakActivities") as? Bool ?? true
         
-        // Launch at login - default to true
-        self.launchAtLogin = defaults.object(forKey: "launchAtLogin") as? Bool ?? true
+        // Launch at login - default to false (user must explicitly enable per App Store guidelines)
+        self.launchAtLogin = defaults.object(forKey: "launchAtLogin") as? Bool ?? false
         
         // Show floating timer on all screens - default to true for better visibility
         self.showFloatingTimerOnAllScreens = defaults.object(forKey: "showFloatingTimerOnAllScreens") as? Bool ?? true
@@ -128,9 +128,12 @@ class Settings: ObservableObject {
         self.weeklySummaryNotifications = defaults.object(forKey: "weeklySummaryNotifications") as? Bool ?? true
         self.achievementNotifications = defaults.object(forKey: "achievementNotifications") as? Bool ?? true
         
-        // Set initial launch at login state
-        if defaults.object(forKey: "launchAtLogin") == nil {
-            setLaunchAtLogin(true)
+        // Only auto-register if user previously enabled it
+        // Do NOT auto-enable on first launch (App Store guideline 2.4.5(iii))
+        if self.launchAtLogin {
+            // If launch at login is enabled in settings, ensure it's actually registered
+            // This handles cases where the setting is ON but registration was lost
+            ensureLaunchAtLoginRegistered()
         }
         
         // Mark as initialized - now didSet handlers can trigger WindowManager
@@ -163,16 +166,46 @@ class Settings: ObservableObject {
     
     // MARK: - Launch at Login
     
+    /// Ensures launch at login is registered if the setting is enabled
+    /// Called on app startup to silently fix registration issues
+    private func ensureLaunchAtLoginRegistered() {
+        if #available(macOS 13.0, *) {
+            let currentStatus = SMAppService.mainApp.status
+            
+            // If setting is ON but not registered/enabled, try to register silently
+            if currentStatus != .enabled {
+                do {
+                    try SMAppService.mainApp.register()
+                    print("✅ Auto-registered launch at login on startup")
+                } catch {
+                    print("ℹ️ Launch at login auto-registration: \(error.localizedDescription)")
+                    // Don't show error on startup - only show when user manually toggles
+                }
+            }
+        }
+    }
+    
     private func setLaunchAtLogin(_ enabled: Bool) {
         if #available(macOS 13.0, *) {
             do {
+                let currentStatus = SMAppService.mainApp.status
+                print("📱 Current launch at login status: \(currentStatus.rawValue)")
+                
                 if enabled {
-                    if SMAppService.mainApp.status == .notRegistered {
+                    // Register if not already enabled
+                    if currentStatus != .enabled {
                         try SMAppService.mainApp.register()
                         print("✅ Launch at login enabled")
+                        
+                        // Log status but don't show UI (auto-registration handles it)
+                        let newStatus = SMAppService.mainApp.status
+                        print("ℹ️ Launch at login status after registration: \(newStatus.rawValue)")
+                    } else {
+                        print("ℹ️ Launch at login already enabled")
                     }
                 } else {
-                    if SMAppService.mainApp.status == .enabled {
+                    // Unregister if currently enabled
+                    if currentStatus == .enabled {
                         try SMAppService.mainApp.unregister()
                         print("⛔ Launch at login disabled")
                     }
@@ -182,7 +215,6 @@ class Settings: ObservableObject {
             }
         } else {
             // Fallback for older macOS versions
-            // This is a simplified version - full implementation would use LSSharedFileList
             print("⚠️ Launch at login requires macOS 13.0 or later")
         }
     }
